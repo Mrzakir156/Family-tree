@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पारिवारिक वृक्ष</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #4b79a1, #283e51, #b3cde0);
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            animation: fadeIn 1s ease-in;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .tree ul {
+            padding-top: 30px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            transition: all 0.5s;
+        }
+        .tree li {
+            float: left;
+            text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 30px 10px 0 10px;
+        }
+        .tree li::before, .tree li::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 50%;
+            border-top: 4px solid #1e3a8a;
+            width: 50%;
+            height: 30px;
+        }
+        .tree li::after {
+            right: auto;
+            left: 50%;
+            border-left: 4px solid #1e3a8a;
+        }
+        .tree li:only-child::after, .tree li:only-child::before {
+            display: none;
+        }
+        .tree li:only-child {
+            padding-top: 0;
+        }
+        .tree li:first-child::before, .tree li:last-child::after {
+            border: 0 none;
+        }
+        .tree li:last-child::before {
+            border-right: 4px solid #1e3a8a;
+            border-radius: 0 10px 0 0;
+        }
+        .tree li:first-child::after {
+            border-radius: 10px 0 0 0;
+        }
+        .tree ul ul::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            border-left: 4px solid #1e3a8a;
+            width: 0;
+            height: 30px;
+        }
+        .node {
+            border: 4px solid #1e3a8a;
+            padding: 15px 30px;
+            text-decoration: none;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: bold;
+            display: inline-block;
+            border-radius: 15px;
+            background: #374151;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease;
+        }
+        .node.male {
+            background: #60a5fa;
+            border-color: #1e40af;
+        }
+        .node.female {
+            background: #f9a8d4;
+            border-color: #be185d;
+        }
+        .node.transgender {
+            background: #c4b5fd;
+            border-color: #6d28d9;
+        }
+        .node:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        @keyframes slideIn {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .add-btn {
+            background: #d4af37;
+            color: #1f2937;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .add-btn:hover {
+            background: #b8972f;
+            transform: scale(1.2);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-content {
+            background: #f3f4f6;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.5s ease;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3a8a, #6d28d9);
+            color: #ffffff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.5s ease;
+        }
+        .start-btn {
+            background: #2563eb;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .start-btn:hover {
+            background: #1e40af;
+            transform: scale(1.05);
+        }
+        .input-field {
+            transition: all 0.3s;
+        }
+        .input-field:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.5);
+        }
+        .btn {
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        .otp-timer {
+            color: #ffffff;
+            font-size: 16px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto p-6" id="login-page">
+        <div class="header text-center mb-12">
+            <h1 class="text-5xl font-bold">पारिवारिक वृक्ष</h1>
+            <p class="text-lg mt-2">लॉगिन करें या नया खाता बनाएं</p>
+        </div>
+        <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">लॉगिन</h2>
+            <div class="mb-4">
+                <label class="block text-lg mb-2">उपयोगकर्ता नाम (ID):</label>
+                <input type="text" id="username" class="w-full p-2 border rounded input-field" placeholder="उपयोगकर्ता नाम डालें">
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg mb-2">पासवर्ड:</label>
+                <input type="password" id="password" class="w-full p-2 border rounded input-field" placeholder="पासवर्ड डालें">
+            </div>
+            <button class="bg-blue-600 text-white px-4 py-2 rounded w-full mb-4 btn" onclick="requestLoginOTP()">लॉगिन</button>
+            <p class="text-center">खाता नहीं है? <a href="#" class="text-blue-500 hover:underline" onclick="showSignup()">नया खाता बनाएं</a></p>
+        </div>
+    </div>
+
+    <div class="container mx-auto p-6 hidden" id="signup-page">
+        <div class="header text-center mb-12">
+            <h1 class="text-5xl font-bold">नया खाता बनाएं</h1>
+            <p class="text-lg mt-2">अपने परिवार का वृक्ष शुरू करें</p>
+        </div>
+        <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+            <div class="mb-4">
+                <label class="block text-lg mb-2">उपयोगकर्ता नाम (ID):</label>
+                <input type="text" id="signup-username" class="w-full p-2 border rounded input-field" placeholder="उपयोगकर्ता नाम डालें">
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg mb-2">पासवर्ड:</label>
+                <input type="password" id="signup-password" class="w-full p-2 border rounded input-field" placeholder="पासवर्ड डालें">
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg mb-2">मोबाइल नंबर:</label>
+                <input type="tel" id="mobile" class="w-full p-2 border rounded input-field" placeholder="जैसे: 9876543210">
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg mb-2">परिवार का नाम:</label>
+                <input type="text" id="family-name" class="w-full p-2 border rounded input-field" placeholder="जैसे: शर्मा परिवार">
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg mb-2">धर्म:</label>
+                <select id="religion" class="w-full p-2 border rounded input-field">
+                    <option value="hindu">हिंदू</option>
+                    <option value="muslim">मुस्लिम</option>
+                    <option value="sikh">सिख</option>
+                    <option value="christian">ईसाई</option>
+                    <option value="jain">जैन</option>
+                    <option value="buddhist">बौद्ध</option>
+                    <option value="parsi">पारसी</option>
+                    <option value="jewish">यहूदी</option>
+                    <option value="bahai">बहाई</option>
+                    <option value="tribal">आदिवासी/जनजातीय</option>
+                    <option value="other">अन्य</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg mb-2">जाति/कुल/कुटुंब:</label>
+                <input type="text" id="caste" class="w-full p-2 border rounded input-field" placeholder="जैसे: ब्राह्मण, सय्यद, जट">
+            </div>
+            <button class="bg-green-600 text-white px-4 py-2 rounded w-full mb-4 btn" onclick="requestSignupOTP()">खाता बनाएं</button>
+            <p class="text-center">पहले से खाता है? <a href="#" class="text-blue-500 hover:underline" onclick="showLogin()">लॉगिन करें</a></p>
+        </div>
+    </div>
+
+    <div class="container mx-auto p-6 hidden" id="otp-page">
+        <div class="header text-center mb-12">
+            <h1 class="text-5xl font-bold">OTP सत्यापन</h1>
+            <p class="text-lg mt-2">आपके मोबाइल नंबर पर भेजा गया OTP डालें</p>
+        </div>
+        <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+            <div class="mb-4">
+                <label class="block text-lg mb-2">OTP:</label>
+                <input type="text" id="otp" class="w-full p-2 border rounded input-field" placeholder="4-अंकीय OTP डालें">
+            </div>
+            <button class="bg-blue-600 text-white px-4 py-2 rounded w-full mb-4 btn" onclick="verifyOTP()">सत्यापित करें</button>
+            <p class="text-center">
+                <span id="otp-timer" class="otp-timer"></span>
+                <a href="#" id="resend-otp" class="text-blue-500 hover:underline" onclick="requestRecentOTP()">हाल का OTP</a> |
+                <a href="#" class="text-blue-500 hover:underline" onclick="showLogin()">वापस</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="container mx-auto p-6 hidden" id="tree-page">
+        <div class="header text-center mb-12">
+            <h1 class="text-5xl font-bold" id="family-title">पारिवारिक वृक्ष</h1>
+            <p class="text-lg mt-2">अपने परिवार को जोड़ें और यादें संजोएं</p>
+            <button class="bg-gray-800 text-white px-4 py-2 rounded mt-4 btn" onclick="logout()">लॉगआउट</button>
+        </div>
+        <div class="tree" id="family-tree">
+            <div class="text-center">
+                <div class="add-btn" onclick="openModal(null)">+</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="add-member-modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-4">नया सदस्य जोड़ें</h2>
+            <div class="mb-4">
+                <label class="block text-lg mb-2">नाम:</label>
+                <input type="text" id="member-name" class="w-full p-2 border rounded input-field" placeholder="नाम डालें">
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg mb-2">जेंडर:</label>
+                <select id="member-gender" class="w-full p-2 border rounded input-field">
+                    <option value="male">पुरुष</option>
+                    <option value="female">महिला</option>
+                    <option value="transgender">ट्रांसजेंडर</option>
+                </select>
+            </div>
+            <div class="mb-4 hidden" id="relation-field">
+                <label class="block text-lg mb-2">रिश्ता:</label>
+                <select id="member-relation" class="w-full p-2 border rounded input-field">
+                    <option value="child">बच्चा</option>
+                    <option value="spouse">पत्नी/पति</option>
+                    <option value="sibling-in-law">जवाई/जीजा</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg mb-2">जन्म तिथि:</label>
+                <input type="date" id="member-dob" class="w-full p-2 border rounded input-field">
+            </div>
+            <div class="flex justify-end">
+                <button class="bg-gray-600 text-white px-4 py-2 rounded mr-2 btn" onclick="closeModal()">रद्द करें</button>
+                <button class="bg-green-600 text-white px-4 py-2 rounded btn" onclick="addMember()">जोड़ें</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let familyTree = null;
+        let currentParentId = null;
+        let tempSignupData = null;
+        let tempLoginData = null;
+        let generatedOTP = null;
+        let otpTimer = null;
+
+        function showLogin() {
+            document.getElementById('login-page').classList.remove('hidden');
+            document.getElementById('signup-page').classList.add('hidden');
+            document.getElementById('otp-page').classList.add('hidden');
+            document.getElementById('tree-page').classList.add('hidden');
+        }
+
+        function showSignup() {
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('signup-page').classList.remove('hidden');
+            document.getElementById('otp-page').classList.add('hidden');
+            document.getElementById('tree-page').classList.add('hidden');
+        }
+
+        function showOTP() {
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('signup-page').classList.add('hidden');
+            document.getElementById('otp-page').classList.remove('hidden');
+            document.getElementById('tree-page').classList.add('hidden');
+            startTimer();
+        }
+
+        function showTree() {
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('signup-page').classList.add('hidden');
+            document.getElementById('otp-page').classList.add('hidden');
+            document.getElementById('tree-page').classList.remove('hidden');
+            document.getElementById('family-title').textContent = currentUser.familyName || 'पारिवारिक वृक्ष';
+            renderTree();
+        }
+
+        function generateOTP() {
+            return Math.floor(1000 + Math.random() * 9000).toString();
+        }
+
+        function requestSignupOTP() {
+            const username = document.getElementById('signup-username').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const mobile = document.getElementById('mobile').value.trim();
+            const familyName = document.getElementById('family-name').value.trim();
+            const religion = document.getElementById('religion').value;
+            const caste = document.getElementById('caste').value.trim();
+            if (!username || !password || !mobile || !familyName || !religion || !caste) {
+                alert('कृपया सभी जानकारी भरें!');
+                return;
+            }
+            if (!/^\d{10}$/.test(mobile)) {
+                alert('कृपया वैध 10 अंकों का मोबाइल नंबर डालें!');
+                return;
+            }
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if (users[username]) {
+                alert('यह उपयोगकर्ता नाम पहले से मौजूद है!');
+                return;
+            }
+            tempSignupData = { username, password, mobile, familyName, religion, caste, familyTree: null };
+            generatedOTP = generateOTP();
+            alert(`आपका OTP है: ${generatedOTP} (यह डेमो है, असली OTP SMS से आएगा)`);
+            showOTP();
+        }
+
+        function requestLoginOTP() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if (!users[username] || users[username].password !== password) {
+                alert('गलत उपयोगकर्ता नाम या पासवर्ड!');
+                return;
+            }
+            tempLoginData = { username };
+            generatedOTP = generateOTP();
+            alert(`आपका OTP है: ${generatedOTP} (यह डेमो है, असली OTP SMS से आएगा)`);
+            showOTP();
+        }
+
+        function requestRecentOTP() {
+            if (otpTimer) clearInterval(otpTimer);
+            document.getElementById('resend-otp').style.display = 'none';
+            document.getElementById('otp-timer').style.display = 'block';
+            let timeLeft = 60;
+            otpTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('otp-timer').textContent = `कृपया ${timeLeft} सेकंड प्रतीक्षा करें...`;
+                if (timeLeft <= 0) {
+                    clearInterval(otpTimer);
+                    document.getElementById('resend-otp').style.display = 'inline';
+                    document.getElementById('otp-timer').style.display = 'none';
+                    generatedOTP = generateOTP();
+                    alert(`नया OTP है: ${generatedOTP} (यह डेमो है, असली OTP SMS से आएगा)`);
+                }
+            }, 1000);
+        }
+
+        function startTimer() {
+            if (otpTimer) clearInterval(otpTimer);
+            document.getElementById('resend-otp').style.display = 'none';
+            document.getElementById('otp-timer').style.display = 'block';
+            let timeLeft = 60;
+            otpTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('otp-timer').textContent = `कृपया ${timeLeft} सेकंड प्रतीक्षा करें...`;
+                if (timeLeft <= 0) {
+                    clearInterval(otpTimer);
+                    document.getElementById('resend-otp').style.display = 'inline';
+                    document.getElementById('otp-timer').style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        function verifyOTP() {
+            const otp = document.getElementById('otp').value.trim();
+            if (otp !== generatedOTP) {
+                alert('गलत OTP! कृपया "हाल का OTP" का उपयोग करें।');
+                return;
+            }
+            if (tempSignupData) {
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                users[tempSignupData.username] = tempSignupData;
+                localStorage.setItem('users', JSON.stringify(users));
+                currentUser = tempSignupData;
+                familyTree = null;
+                tempSignupData = null;
+                generatedOTP = null;
+                showTree();
+            } else if (tempLoginData) {
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                currentUser = users[tempLoginData.username];
+                familyTree = currentUser.familyTree;
+                tempLoginData = null;
+                generatedOTP = null;
+                showTree();
+            }
+        }
+
+        function logout() {
+            currentUser.familyTree = familyTree;
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            users[currentUser.username] = currentUser;
+            localStorage.setItem('users', JSON.stringify(users));
+            currentUser = null;
+            familyTree = null;
+            showLogin();
+        }
+
+        function loadTree() {
+            if (currentUser && currentUser.familyTree) {
+                familyTree = currentUser.familyTree;
+            }
+            renderTree();
+        }
+
+        function saveTree() {
+            if (currentUser) {
+                currentUser.familyTree = familyTree;
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                users[currentUser.username] = currentUser;
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+        }
+
+        function renderTree() {
+            const treeContainer = document.getElementById('family-tree');
+            treeContainer.innerHTML = '';
+            if (!familyTree) {
+                treeContainer.innerHTML = `
+                    <div class="text-center">
+                        <div class="add-btn" onclick="openModal(null)">+</div>
+                    </div>
+                `;
+                return;
+            }
+            const ul = document.createElement('ul');
+            ul.appendChild(generateTreeNode(familyTree));
+            treeContainer.appendChild(ul);
+        }
+
+        function generateTreeNode(member) {
+            const li = document.createElement('li');
+            const divNode = document.createElement('div');
+            divNode.className = `node ${member.gender}`;
+            divNode.dataset.id = member.id;
+            divNode.dataset.name = member.name;
+            divNode.dataset.gender = member.gender;
+            divNode.dataset.dob = member.dob;
+            divNode.dataset.relation = member.relation;
+            divNode.innerHTML = `${member.name}<br><small>(जन्म: ${new Date(member.dob).toLocaleDateString('hi-IN')})</small>`;
+            const addBtn = document.createElement('div');
+            addBtn.className = 'add-btn';
+            addBtn.innerText = '+';
+            addBtn.onclick = () => openModal(member.id);
+            li.appendChild(divNode);
+            li.appendChild(addBtn);
+
+            const ul = document.createElement('ul');
+            if (member.spouse) {
+                ul.appendChild(generateTreeNode(member.spouse));
+            }
+            if (member.siblingsInLaw && member.siblingsInLaw.length > 0) {
+                member.siblingsInLaw.forEach(sibling => {
+                    ul.appendChild(generateTreeNode(sibling));
+                });
+            }
+            if (member.children && member.children.length > 0) {
+                member.children.forEach(child => {
+                    ul.appendChild(generateTreeNode(child));
+                });
+            }
+            li.appendChild(ul);
+            return li;
+        }
+
+        function openModal(parentId) {
+            currentParentId = parentId;
+            document.getElementById('add-member-modal').classList.remove('hidden');
+            const relationField = document.getElementById('relation-field');
+            if (!parentId) {
+                relationField.classList.add('hidden');
+            } else {
+                relationField.classList.remove('hidden');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('add-member-modal').classList.add('hidden');
+            document.getElementById('member-name').value = '';
+            document.getElementById('member-gender').value = 'male';
+            document.getElementById('member-relation').value = 'child';
+            document.getElementById('member-dob').value = '';
+        }
+
+        function addMember() {
+            const name = document.getElementById('member-name').value.trim();
+            const gender = document.getElementById('member-gender').value;
+            const relation = document.getElementById('member-relation').value;
+            const dob = document.getElementById('member-dob').value;
+            if (!name || !dob) {
+                alert('कृपया नाम और जन्म तिथि डालें!');
+                return;
+            }
+            const newMember = {
+                id: Date.now(),
+                name,
+                gender,
+                dob,
+                relation: currentParentId ? relation : 'root',
+                children: [],
+                spouse: null,
+                siblingsInLaw: []
+            };
+            if (!familyTree) {
+                familyTree = newMember;
+            } else {
+                addMemberToTree(familyTree, currentParentId, newMember, relation);
+            }
+            saveTree();
+            renderTree();
+            closeModal();
+        }
+
+        function addMemberToTree(node, parentId, newMember, relation) {
+            if (node.id === parentId) {
+                if (relation === 'child') {
+                    node.children.push(newMember);
+                } else if (relation === 'spouse') {
+                    node.spouse = newMember;
+                } else if (relation === 'sibling-in-law') {
+                    node.siblingsInLaw.push(newMember);
+                }
+                return true;
+            }
+            if (node.spouse && addMemberToTree(node.spouse, parentId, newMember, relation)) {
+                return true;
+            }
+            for (let sibling of node.siblingsInLaw) {
+                if (addMemberToTree(sibling, parentId, newMember, relation)) {
+                    return true;
+                }
+            }
+            for (let child of node.children) {
+                if (addMemberToTree(child, parentId, newMember, relation)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        window.onload = showLogin;
+    </script>
+</body>
+</html>
